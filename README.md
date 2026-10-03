@@ -38,7 +38,6 @@ Tripwire was built from 17 local session transcripts: 546 Bash calls. Each rule 
 | zsh glob abort, macOS has no `timeout`, `gh pr create` without `--head`, `gh pr view --json merged` | note | one fix line each |
 | background shells still open | status line, plus a toast at turn end | "what are the 5 shells that are open still doing?" |
 | foreground call running longer than 5 minutes | status line, then a toast | a 51-minute foreground Agent call |
-| non-`main` branch pushed with no PR in the same turn | toast | for workflows where every pushed branch gets a PR |
 
 The replay applies the same patterns the rules use to the Bash calls in those transcripts. The counts describe one person's sessions, so another machine will see different numbers.
 

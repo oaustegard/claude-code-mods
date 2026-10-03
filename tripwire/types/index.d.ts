@@ -1,10 +1,10 @@
 export type BgTask = { id: string; label: string; startedAt: number; isAuto: boolean }
 
-/** Keyed by trip name: findRoot, pollLoop, maskedError, hint, autoBg, bgAtEnd, pushNoPr. */
+/** Keyed by trip name: findRoot, pollLoop, maskedError, hint, autoBg, bgAtEnd. */
 export type Counts = { [trip: string]: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    tripwire: { bg: BgTask[]; pendingPush: string | null; counts: Counts }
+    tripwire: { bg: BgTask[]; counts: Counts }
   }
 }

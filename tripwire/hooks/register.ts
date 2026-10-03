@@ -8,7 +8,6 @@ import type { BgTask, Counts } from '../types'
 // alternative, not just the rule.
 
 const bg = atom({ plugin: 'tripwire', key: 'bg' } as const, [] as BgTask[])
-const pendingPush = atom({ plugin: 'tripwire', key: 'pendingPush' } as const, null as string | null)
 const counts = atom({ plugin: 'tripwire', key: 'counts' } as const, {} as Counts)
 
 const ALLOW = /#\s*tripwire:allow\b/
@@ -83,7 +82,6 @@ const HINTS: [RegExp, string][] = [
 type BashRecord = {
   backgroundTaskId?: string
   timedOutAfterMs?: number
-  gitOperation?: { push?: { branch: string }; pr?: { number: number; action: string } }
 }
 
 const inFlight = new Map<string, { label: string; startedAt: number; isWarned: boolean }>()
@@ -236,13 +234,6 @@ export const register: Register = on => {
           $.ui.toast(`Auto-backgrounded after ${Math.round((record.timedOutAfterMs ?? 0) / 1000)}s: ${task.label}`)
         }
       }
-      const git = record.gitOperation
-      if (git?.pr) {
-        await update($, pendingPush, () => null)
-      } else if (git?.push && !/^(main|master)$/.test(git.push.branch)) {
-        const branch = git.push.branch
-        await update($, pendingPush, () => branch)
-      }
       void tick($)
     }
 
@@ -284,13 +275,6 @@ export const register: Register = on => {
           live.map(t => `${short(t.label, 30)} (${minutes(now - t.startedAt)})`).join(', '),
         { timeoutMs: 10_000 },
       )
-    }
-
-    const branch = await read($, pendingPush)
-    if (branch !== null) {
-      await trip($, 'pushNoPr')
-      await update($, pendingPush, () => null)
-      $.ui.toast(`Pushed ${branch} but no PR was opened this turn`, { timeoutMs: 10_000 })
     }
 
     return result
