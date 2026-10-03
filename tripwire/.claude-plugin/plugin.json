@@ -1,0 +1,6 @@
+{
+  "name": "tripwire",
+  "version": "0.1.0",
+  "description": "Catches recurring agent failures from past transcripts: whole-disk find, foreground poll loops, errors masked by | tail, forgotten background shells, pushes with no PR",
+  "types": "./types/index.d.ts"
+}
