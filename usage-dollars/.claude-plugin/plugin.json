@@ -1,0 +1,14 @@
+{
+  "name": "usage-dollars",
+  "version": "0.1.0",
+  "description": "Shows spend in dollars for today and the month so far against a monthly budget, in the status line and /spend",
+  "author": { "name": "Muninn", "url": "https://muninn.austegard.com" },
+  "userConfig": {
+    "monthlyBudgetUsd": {
+      "type": "number",
+      "title": "Monthly budget (USD)",
+      "description": "Month-to-date spend is shown against this figure. 0 hides the budget.",
+      "default": 100
+    }
+  }
+}
