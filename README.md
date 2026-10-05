@@ -5,6 +5,7 @@ Plugins for Claude Code that run code around the agent's tool calls: they can bl
 | Mod | What it does |
 |---|---|
 | [`tripwire`](tripwire/) | Blocks or annotates shell mistakes that recur in Claude Code sessions: whole-disk `find`, long foreground sleep loops, errors hidden by `\| tail`, forgotten background shells |
+| [`usage-dollars`](usage-dollars/) | Spend in dollars for today and the month so far against a monthly budget: status line, toast at 80% and 100%, `/spend` |
 
 The hook API these mods use is marked early access in Claude Code's own type declarations and can change between releases. Those declarations were written by Claude Code 2.1.286, the version tripwire was developed against.
 
@@ -42,3 +43,9 @@ Tripwire was built from 17 local session transcripts: 546 Bash calls. Each rule 
 The replay applies the same patterns the rules use to the Bash calls in those transcripts. The counts describe one person's sessions, so another machine will see different numbers.
 
 `# tripwire:allow` in a command lets a block through when the person asked for exactly that. `/tripwire` lists the counts for the current session and for all sessions (kept in the plugin store) and the open background tasks. The counts show whether a rule still fires, and a rule that never trips is a candidate for deletion.
+
+## usage-dollars
+
+Books each session's cost (`$.session.usage().cost.usd`, what `/cost` totals) into a per-day ledger in the plugin store, shared by every session on the machine. The status line shows `$1.20 today · $34.10/$100.00 month (34%)`, a toast fires once at 80% and once at 100% of the budget, and `/spend` prints the same figures plus what remains. Per-conversation spend is not shown: the default donut chart button covers it.
+
+Set the budget in the config menu (`monthlyBudgetUsd`, default 100, 0 hides it). The ledger starts when the mod is first loaded, so earlier spend is not counted, and a resumed session's past cost is not re-booked.
