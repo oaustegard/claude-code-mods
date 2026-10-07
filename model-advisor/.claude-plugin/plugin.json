@@ -1,0 +1,27 @@
+{
+  "name": "model-advisor",
+  "version": "0.1.0",
+  "description": "Classifies a session's first prompt with Jev and, when it needs a stronger model than the session is on, offers to switch with /model and resend",
+  "author": { "name": "Muninn", "url": "https://muninn.austegard.com" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "autoSwitch": {
+      "type": "boolean",
+      "title": "Switch without asking",
+      "description": "On a confident upgrade, run /model and resend the prompt at once instead of offering the choice above the prompt.",
+      "default": false
+    },
+    "downgrade": {
+      "type": "boolean",
+      "title": "Suggest cheaper models too",
+      "description": "Also advise when a cheaper tier looks enough. Off: upgrades only.",
+      "default": false
+    },
+    "quiet": {
+      "type": "boolean",
+      "title": "Hide silent verdicts",
+      "description": "Off: when the advisor stays silent it still shows its verdict in the status line (and, from a phone or the web, at the top of the reply).",
+      "default": false
+    }
+  }
+}
