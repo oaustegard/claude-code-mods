@@ -7,7 +7,7 @@ Plugins for Claude Code that run code around the agent's tool calls: they can bl
 | [`tripwire`](tripwire/) | Blocks or annotates shell mistakes that recur in Claude Code sessions: whole-disk `find`, long foreground sleep loops, errors hidden by `\| tail`, forgotten background shells |
 | [`usage-dollars`](usage-dollars/) | Spend in dollars for today and the month so far against a monthly budget: status line, toast at 80% and 100%, `/spend` |
 | [`model-advisor`](model-advisor/) | Classifies a session's first prompt with Jev and, when it needs a stronger model than the session is on, offers to run `/model` and resend it |
-| [`effort-escalator`](effort-escalator/) | Raises the rest of a turn to `xhigh` when the `escalating-effort` skill is invoked, shows the effort each request goes out at on the status line, and notes beneath the answer when a turn ran raised |
+| [`effort-escalator`](effort-escalator/) | Keeps a session at `low` effort and raises a turn when it needs more: Jev rates each prompt before the turn starts, and repeated tool failures tell the model to invoke the `escalating-effort` skill. The model ends a raised turn's reply with a line saying so |
 
 The hook API these mods use is marked early access in Claude Code's own type declarations and can change between releases. Those declarations were written by Claude Code 2.1.286, the version tripwire was developed against.
 
@@ -64,4 +64,9 @@ The mod exports `MODEL_ADVISOR_MOD=1`, and the workspace hook stands down when i
 
 ## effort-escalator
 
-Companion to the `escalating-effort` skill in `oaustegard/claude-workspace`. The skill's `effort: xhigh` frontmatter raises the turn, but nothing shows that in the interface. When the skill succeeds in the main loop, the mod marks the turn, sends every later `turn.step` of it at `xhigh`, toasts the raise, and keeps `effort <level>` on the status line. At `turn.complete` it clears the raise and adds the line `effort-escalator: this turn ran at xhigh` beneath the answer, which shows even in a client that draws no status line or toast. Subagent turns are left alone. The state is module-local, so a reload mid-turn drops a raise.
+Lets a session run at `effortLevel: low` and spend more reasoning only on the turns that need it. It escalates in two ways, because Claude Code applies an effort change only to a request that carries new input: a level set on a request whose only new input is tool results does not take effect, and neither does a note attached to a tool result.
+
+- **At the prompt.** Each prompt that starts a turn goes to Jev, together with the end of the previous reply, and Jev rates the work as `low`, `high` or `xhigh`. At 0.6 or more for `high` or `xhigh`, the turn's first request goes out at that level, and the level holds for the whole turn. Jev answers in 200–500 ms. Slash commands, prompts the person did not type, prompts delivered into a running turn and prompts containing `#no-escalate` are not rated.
+- **Mid-turn.** After two failed tool calls in a turn still at the default, the next tool result carries a note telling the model to invoke the `escalating-effort` skill. The skill's text arrives as new input, so its `effort: xhigh` frontmatter takes effect from the next request. The model can also invoke the skill on its own judgment.
+
+The app does not draw a cloud session's mod toasts or status line, so whenever a turn is raised the mod asks the model to end its reply with `↑ effort <level> this turn (effort-escalator: <why>)`. Each decision and each raised request is logged to `/tmp/effort-escalator.log`. `EFFORT_ESCALATOR=off` turns it off. The classifier is reached the way `model-advisor` reaches it (`TYPESAFE_API_KEY`, or `CF_ACCOUNT_ID` + `CF_API_TOKEN` with an optional `CF_GATEWAY_ID`). If the classifier is unreachable or fails, the turn stays at the default. The state is module-local, so a reload in the middle of a turn drops that turn's raise.
