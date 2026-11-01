@@ -106,10 +106,11 @@ export const register: Register = on => {
   }).catch(($, e, next) => next(e))
 
   // Count failed tool calls; past FAIL_MAX in a turn still at the default, tell the model to escalate.
+  // A permission denial is not a failure: the workspace rule is to stop on one, not to try harder.
   on('tool.call', async ($, e, next) => {
     const ran = await next(e)
     if (e.agentId !== undefined || e.tool === 'Skill') return ran
-    if (ran.deny === undefined && ran.isError !== true) return ran
+    if (ran.deny !== undefined || ran.isError !== true) return ran
     failures += 1
     if (failures < FAIL_MAX || nudged || raised?.turnId === currentTurn) return ran
     nudged = true
