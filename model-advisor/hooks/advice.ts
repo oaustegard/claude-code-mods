@@ -162,15 +162,6 @@ export const suggest = (
 const pct = (x: number) => `${Math.round(x * 100)}%`
 const a = (name: string) => (/^[AEIOU]/.test(name) ? `an ${name}` : `a ${name}`)
 
-export const WHY_SILENT: Record<string, string> = {
-  agrees: "agrees with the session's model",
-  unsure: 'leans another way, but not confidently enough to interrupt',
-  'unknown-model': "couldn't read the session's model",
-  cheaper: 'a cheaper model looks enough, and the advisor only suggests upgrades',
-  opaque: 'the prompt points at the work rather than describing it, so no call',
-  quick: 'looks like a few-minute session, not worth interrupting',
-}
-
 /** One line for a suggestion: the tier, how sure, and the cost ratio. */
 export const advice = (rec: Tier, rule: string, current: Tier | null, cls: Classification): string => {
   const { name } = MODELS[rec]
@@ -202,7 +193,7 @@ export const relayContext = (rec: Tier, current: Tier | null, line: string): str
 /** The status-line verdict when the advisor stays silent. */
 export const verdict = (rule: string, current: Tier | null, cls: Classification): string => {
   const b = best(cls.tier)
-  const on = current ? MODELS[current].name : 'unknown model'
+  const on = current ? `, on ${MODELS[current].name}` : ''
 
-  return `advisor: ${MODELS[b].name}-shaped (${pct(cls.tier[b])}), on ${on}; quick ${pct(cls.scope.quick)}, describes the work ${pct(cls.judgeable)}. Silent: ${WHY_SILENT[rule] ?? rule}.`
+  return `advisor: ${MODELS[b].name}-shaped (${pct(cls.tier[b])})${on}; quick ${pct(cls.scope.quick)}, describes the work ${pct(cls.judgeable)}. No call.`
 }

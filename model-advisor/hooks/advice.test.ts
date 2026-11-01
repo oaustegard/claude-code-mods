@@ -60,6 +60,8 @@ test('parseJev reads both shapes and refuses a broken one', () => {
 test('messages name the tier, the confidence and the price ratio', () => {
   expect(advice('opus', 'tier', 'sonnet', cls('opus'))).toContain('Opus 5.5 costs about 2.0x more')
   expect(advice('haiku', 'tier', 'sonnet', cls('haiku'))).toContain('20.0x less')
-  expect(verdict('agrees', 'sonnet', cls('sonnet'))).toContain("agrees with the session's model")
+  expect(verdict('agrees', 'sonnet', cls('sonnet'))).toContain('on Sonnet 5.5;')
+  expect(verdict('agrees', 'sonnet', cls('sonnet'))).toMatch(/No call\.$/)
+  expect(verdict('unknown-model', null, cls('sonnet'))).not.toContain(' on ')
   expect(MODELS.haiku.name).toBe('Haiku 5.5')
 })
