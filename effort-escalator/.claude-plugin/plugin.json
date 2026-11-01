@@ -1,0 +1,1 @@
+{ "name": "effort-escalator", "version": "0.1.0", "description": "Raises the rest of a turn to xhigh when the escalating-effort skill is invoked, and shows the effort each request goes out at" }

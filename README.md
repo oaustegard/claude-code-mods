@@ -7,6 +7,7 @@ Plugins for Claude Code that run code around the agent's tool calls: they can bl
 | [`tripwire`](tripwire/) | Blocks or annotates shell mistakes that recur in Claude Code sessions: whole-disk `find`, long foreground sleep loops, errors hidden by `\| tail`, forgotten background shells |
 | [`usage-dollars`](usage-dollars/) | Spend in dollars for today and the month so far against a monthly budget: status line, toast at 80% and 100%, `/spend` |
 | [`model-advisor`](model-advisor/) | Classifies a session's first prompt with Jev and, when it needs a stronger model than the session is on, offers to run `/model` and resend it |
+| [`effort-escalator`](effort-escalator/) | Raises the rest of a turn to `xhigh` when the `escalating-effort` skill is invoked, shows the effort each request goes out at on the status line, and notes beneath the answer when a turn ran raised |
 
 The hook API these mods use is marked early access in Claude Code's own type declarations and can change between releases. Those declarations were written by Claude Code 2.1.286, the version tripwire was developed against.
 
@@ -60,3 +61,7 @@ The rules are the hook's: upgrades only, fired at 75% confidence. A prompt that 
 The classifier is Jev, reached through TypeSafe (`TYPESAFE_API_KEY`) or the Cloudflare AI Gateway (`CF_ACCOUNT_ID`, `CF_API_TOKEN`, `CF_GATEWAY_ID`), read from the environment. With neither present the mod does nothing. Options: `autoSwitch` switches and resends without asking; `downgrade` also suggests cheaper tiers; `quiet` hides the one-line verdict the status line otherwise shows when it stays silent.
 
 The mod exports `MODEL_ADVISOR_MOD=1`, and the workspace hook stands down when it sees that, so loading both advises once. `hooks/advice.ts` carries the tier table and criteria, and `scripts/model_advisor.py` has a copy that must change with it.
+
+## effort-escalator
+
+Companion to the `escalating-effort` skill in `oaustegard/claude-workspace`. The skill's `effort: xhigh` frontmatter raises the turn, but nothing shows that in the interface. When the skill succeeds in the main loop, the mod marks the turn, sends every later `turn.step` of it at `xhigh`, toasts the raise, and keeps `effort <level>` on the status line. At `turn.complete` it clears the raise and adds the line `effort-escalator: this turn ran at xhigh` beneath the answer, which shows even in a client that draws no status line or toast. Subagent turns are left alone. The state is module-local, so a reload mid-turn drops a raise.
