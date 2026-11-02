@@ -8,7 +8,7 @@ const ORDER = ['low', 'medium', 'high', 'xhigh', 'max']
 /** True when `a` is a higher effort than `b`; an unknown or numeric level ranks lowest. */
 export const above = (a: unknown, b: unknown): boolean => ORDER.indexOf(String(a)) > ORDER.indexOf(String(b))
 
-export const THETA = 0.6 // Jev's probability for a level before the turn is raised to it
+export const THETA = 0.65 // Jev's probability for a level before the turn is raised to it
 export const FAIL_MAX = 2 // failed tool calls in one turn before the model is told to escalate
 export const PROMPT_CHARS = 4000
 export const REPLY_CHARS = 1500
@@ -17,9 +17,9 @@ export const OPT_OUT = '#no-escalate'
 
 export const CRITERIA: Record<Level, string> = {
   low:
-    'Routine: a lookup, a status check, a conversational reply, a confirmation or go-ahead for work already planned, running a known command, a small mechanical edit.',
+    'Routine: a lookup, a status check, a question, opinion or idea to discuss, a confirmation or go-ahead for work already planned, running a known command, an edit, fix or small feature whose change is clear.',
   high:
-    'Moderate: a bounded fix or feature in one or two files with a likely cause or a clear plan, an investigation with an obvious first step, a few paragraphs of careful writing.',
+    'Moderate: a fix or feature whose approach has to be worked out but stays inside one component, an investigation with several plausible causes, a careful written deliverable.',
   xhigh:
     'Hard: debugging whose cause is unclear, a design tradeoff, a change across several files or systems, a derivation or proof, an experiment to design, or a second attempt after a failed one.',
 }
@@ -87,11 +87,8 @@ export const parseJev = (text: string, gateway: boolean): Record<Level, number> 
 /** The level to raise the turn to, or null to leave it at the default. */
 export const decide = (p: Record<Level, number>, theta = THETA): Level | null => {
   const best = LEVELS.reduce((a, b) => (p[b] > p[a] ? b : a))
-  if (best === 'low') return null
-  // A turn Jev splits between high and xhigh still clears the bar for high.
-  if (p[best] >= theta) return best
-  if (p.high + p.xhigh >= theta) return 'high'
-  return null
+  // Only a confident call raises: a split between high and xhigh was mostly discussion.
+  return best !== 'low' && p[best] >= theta ? best : null
 }
 
 export const visibleLine = (level: string, why: string) => `↑ effort ${level} this turn (effort-escalator: ${why})`

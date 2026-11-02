@@ -11,9 +11,15 @@ test('a confident level raises; low and doubt stay', () => {
   expect(decide(p(0.45, 0.3, 0.25))).toBe(null)
 })
 
-test('a split between high and xhigh still raises to high', () => {
-  expect(decide(p(0.3, 0.3, 0.4))).toBe('high')
-  expect(decide(p(0.5, 0.2, 0.3))).toBe(null)
+test('a split between high and xhigh stays at the default', () => {
+  // From a sample of real prompts: "Could we use it to play doom?" and similar discussion split this way.
+  expect(decide(p(0.3, 0.3, 0.4))).toBe(null)
+  expect(decide(p(0.05, 0.5, 0.45))).toBe(null)
+})
+
+test('the bar is 0.65', () => {
+  expect(decide(p(0.31, 0.65, 0.04))).toBe('high')
+  expect(decide(p(0.36, 0.64, 0.0))).toBe(null)
 })
 
 test('above ranks levels and never lowers', () => {
