@@ -8,7 +8,7 @@ const ORDER = ['low', 'medium', 'high', 'xhigh', 'max']
 /** True when `a` is a higher effort than `b`; an unknown or numeric level ranks lowest. */
 export const above = (a: unknown, b: unknown): boolean => ORDER.indexOf(String(a)) > ORDER.indexOf(String(b))
 
-export const THETA = 0.65 // Jev's probability for a level before the turn is raised to it
+export const THETA = 0.8 // Jev's probability for a level before the turn is raised to it
 export const FAIL_MAX = 2 // failed tool calls in one turn before the model is told to escalate
 export const PROMPT_CHARS = 4000
 export const REPLY_CHARS = 1500
@@ -17,11 +17,11 @@ export const OPT_OUT = '#no-escalate'
 
 export const CRITERIA: Record<Level, string> = {
   low:
-    'Routine: a lookup, a status check, a question, opinion or idea to discuss, a confirmation or go-ahead for work already planned, running a known command, an edit, fix or small feature whose change is clear.',
+    'Routine: a lookup, a status check, a question, opinion or idea to discuss, a confirmation or go-ahead for work already planned, running a known command, an edit, fix or feature whose change is clear, a task with many steps that are each straightforward.',
   high:
-    'Moderate: a fix or feature whose approach has to be worked out but stays inside one component, an investigation with several plausible causes, a careful written deliverable.',
+    'Moderate: a fix or feature whose approach has to be worked out, a change across several files, an investigation with several plausible causes, an experiment or comparison to run, a careful written deliverable.',
   xhigh:
-    'Hard: debugging whose cause is unclear, a design tradeoff, a change across several files or systems, a derivation or proof, an experiment to design, or a second attempt after a failed one.',
+    'Hard: debugging whose cause stays unclear after a first look, a design tradeoff with no obvious answer, a derivation or proof, or a second attempt after a failed one. Size, step count and file count alone are not hard.',
 }
 
 export type JevEnv = { typesafeKey?: string; cfAccount?: string; cfToken?: string; cfGateway?: string }

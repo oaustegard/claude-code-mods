@@ -5,8 +5,8 @@ import { above, decide, failNote, jevCall, parseJev, showNote, visibleLine } fro
 const p = (low: number, high: number, xhigh: number) => ({ low, high, xhigh })
 
 test('a confident level raises; low and doubt stay', () => {
-  expect(decide(p(0.1, 0.1, 0.8))).toBe('xhigh')
-  expect(decide(p(0.2, 0.7, 0.1))).toBe('high')
+  expect(decide(p(0.05, 0.1, 0.85))).toBe('xhigh')
+  expect(decide(p(0.1, 0.85, 0.05))).toBe('high')
   expect(decide(p(0.8, 0.1, 0.1))).toBe(null)
   expect(decide(p(0.45, 0.3, 0.25))).toBe(null)
 })
@@ -17,9 +17,9 @@ test('a split between high and xhigh stays at the default', () => {
   expect(decide(p(0.05, 0.5, 0.45))).toBe(null)
 })
 
-test('the bar is 0.65', () => {
-  expect(decide(p(0.31, 0.65, 0.04))).toBe('high')
-  expect(decide(p(0.36, 0.64, 0.0))).toBe(null)
+test('the bar is 0.8', () => {
+  expect(decide(p(0.16, 0.8, 0.04))).toBe('high')
+  expect(decide(p(0.1, 0.12, 0.78))).toBe(null)
 })
 
 test('above ranks levels and never lowers', () => {
